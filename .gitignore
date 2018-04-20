@@ -1,7 +1,9 @@
 # Created by .ignore support plugin (hsz.mobi)
 
-/.idea/
-/templates/
-/venv/
+.idea/
+templates/
+venv/
+media/
 
 db.sqlite3
+CowInfoWeb/settings.py
