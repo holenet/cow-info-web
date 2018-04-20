@@ -3,4 +3,4 @@ from django.shortcuts import render
 
 
 def test(request):
-    return HttpResponse('ssssssssssss')
+    return HttpResponse('ssssssssssss22222222')
