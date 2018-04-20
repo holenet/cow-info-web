@@ -3,4 +3,4 @@ from django.shortcuts import render
 
 
 def test(request):
-    return HttpResponse('It is cowapp test page.')
+    return HttpResponse('It is cowapp test page. Wow It\'s successful!!')
