@@ -15,6 +15,7 @@ def cow_number_restriction(num):
 
 class CowSerializer(serializers.ModelSerializer):
     number = serializers.CharField(validators=[cow_number_restriction])
+    sex = serializers.ChoiceField(choices=[('female', 'female'), ('male', 'male')])
 
     class Meta:
         model = Cow
