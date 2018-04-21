@@ -4,5 +4,5 @@ from cowapp import views
 
 app_name = 'cowapp'
 urlpatterns = [
-    path('', views.test, name='test'),
+    path('', views.CowList.as_view()),
 ]

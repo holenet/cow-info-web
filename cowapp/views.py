@@ -1,6 +1,13 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+
+from cowapp.models import Cow
+from cowapp.serializers import CowSerializer
 
 
-def test(request):
-    return HttpResponse('ssssssssssss22222222')
+class CowList(generics.ListCreateAPIView):
+    serializer_class = CowSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Cow.objects.filter(user=self.request.user)
