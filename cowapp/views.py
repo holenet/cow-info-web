@@ -2,7 +2,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from cowapp.models import Cow
-from cowapp.serializers import CowSerializer
+from cowapp.permissions import IsUser
+from cowapp.serializers import CowSerializer, CowDetailSerializer
 
 
 class CowList(generics.ListCreateAPIView):
@@ -14,3 +15,9 @@ class CowList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class CowDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Cow.objects.all()
+    serializer_class = CowDetailSerializer
+    permission_classes = (IsAuthenticated, IsUser)
