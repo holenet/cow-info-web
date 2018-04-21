@@ -11,3 +11,21 @@ class Cow(models.Model):
 
     class Meta:
         ordering = ('created',)
+
+    def __str__(self):
+        return self.number
+
+
+class Record(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    cow = models.ForeignKey('cowapp.Cow', related_name='records', on_delete=models.CASCADE)
+    content = models.TextField()
+    etc = models.TextField(null=True, blank=True)
+    day = models.DateTimeField()
+    user = models.ForeignKey('auth.User', related_name='records', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ('created',)
+
+    def __str__(self):
+        return "{}: {}".format(self.cow.number, self.content)

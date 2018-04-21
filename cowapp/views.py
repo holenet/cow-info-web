@@ -1,9 +1,9 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
-from cowapp.models import Cow
+from cowapp.models import Cow, Record
 from cowapp.permissions import IsUser
-from cowapp.serializers import CowSerializer, CowDetailSerializer
+from cowapp.serializers import CowSerializer, CowDetailSerializer, RecordSerializer
 
 
 class CowList(generics.ListCreateAPIView):
@@ -21,3 +21,24 @@ class CowDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Cow.objects.all()
     serializer_class = CowDetailSerializer
     permission_classes = (IsAuthenticated, IsUser)
+
+
+class RecordList(generics.ListCreateAPIView):
+    serializer_class = RecordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        if 'pk' in self.kwargs:
+            return Record.objects.filter(cow_id=self.kwargs['pk'])
+        return Record.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class RecordDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = RecordSerializer
+    permission_classes = (IsAuthenticated, IsUser)
+
+    def get_queryset(self):
+        return Record.objects.filter(user=self.request.user)

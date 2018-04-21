@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from cowapp.models import Cow, Record
+
+admin.site.register(Cow)
+admin.site.register(Record)
