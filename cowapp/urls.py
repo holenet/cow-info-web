@@ -5,6 +5,10 @@ from cowapp import views
 
 app_name = 'cowapp'
 urlpatterns = [
+    path('users/', views.UserList.as_view()),
+    path('users/new/', views.UserCreate.as_view()),
+    path('users/<int:pk>/', views.UserDetail.as_view()),
+
     path('cows/', views.CowList.as_view()),
     path('cows/<int:pk>/', views.CowDetail.as_view()),
 
