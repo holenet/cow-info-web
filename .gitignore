@@ -6,5 +6,4 @@ venv/
 media/
 
 db.sqlite3
-CowInfoWeb/settings.py
 *.pyc
