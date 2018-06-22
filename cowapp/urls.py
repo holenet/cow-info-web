@@ -10,7 +10,7 @@ urlpatterns = [
 
     path('records/', views.RecordList.as_view()),
     path('records/<int:pk>/', views.RecordDetail.as_view()),
-    path('records/cow/<int:pk>/', views.RecordList.as_view()),
+    path('records/cow/<int:cow>/', views.RecordList.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
