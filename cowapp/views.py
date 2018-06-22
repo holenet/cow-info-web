@@ -1,10 +1,11 @@
+from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 
 from cowapp.models import Cow, Record
 from cowapp.permissions import IsOwner
-from cowapp.serializers import CowSerializer, CowDetailSerializer, RecordSerializer
+from cowapp.serializers import CowSerializer, CowDetailSerializer, RecordSerializer, UserSerializer
 
 
 class FilterOrderAPIView(generics.GenericAPIView):
@@ -36,6 +37,27 @@ class FilterOrderAPIView(generics.GenericAPIView):
         if ordering:
             return queryset.filter(**options).order_by(ordering)
         return queryset.filter(**options)
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminUser,)
+
+
+class UserCreate(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (AllowAny,)
+
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self):
+        return User.objects.get_by_natural_key(self.request.user.username)
 
 
 class CowList(FilterOrderAPIView, generics.ListCreateAPIView):
