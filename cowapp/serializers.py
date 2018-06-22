@@ -1,7 +1,28 @@
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from cowapp.models import Cow, Record
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: User
+        fields = ('id', 'username', 'password', 'cows', 'records')
+        read_only_fields = ('cows', 'records')
+
+    def validate(self, data):
+        if 'password' not in data:
+            return data
+        try:
+            user = self.instance if self.instance else User(username=data['username'])
+            validate_password(data['password'], user=user)
+        except ValidationError as e:
+            raise serializers.ValidationError(dict(password=e.messages))
+        data['password'] = make_password(data['password'])
+        return data
 
 
 class RecordSerializer(serializers.ModelSerializer):
@@ -26,7 +47,7 @@ class CowSerializer(serializers.ModelSerializer):
                 if len(arr[0]) == 3 and len(arr[1]) == len(arr[2]) == 4 and len(arr[3]) == 1:
                     if all([y.isdigit() for x in arr for y in x]):
                         return num
-        raise ValidationError("Pattern of number is not valid")
+        raise serializers.ValidationError("Pattern of number is not valid")
 
 
 class CowDetailSerializer(CowSerializer):
