@@ -3,7 +3,7 @@ from django.db import models
 
 class Cow(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    number = models.TextField(unique=True)
+    number = models.CharField(max_length=20, unique=True)
     sex = models.TextField()
     birthday = models.DateField(null=True, blank=True)
     mother = models.ForeignKey('cowapp.Cow', related_name='children', on_delete=models.SET_NULL, null=True, blank=True)
