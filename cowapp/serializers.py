@@ -9,7 +9,7 @@ from cowapp.models import Cow, Record
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model: User
+        model = User
         fields = ('id', 'username', 'password', 'cows', 'records')
         read_only_fields = ('cows', 'records')
 
