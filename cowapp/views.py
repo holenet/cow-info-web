@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from cowapp.models import Cow, Record
-from cowapp.permissions import IsUser
+from cowapp.permissions import IsOwner
 from cowapp.serializers import CowSerializer, CowDetailSerializer, RecordSerializer
 
 
@@ -20,7 +20,7 @@ class CowList(generics.ListCreateAPIView):
 class CowDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Cow.objects.all()
     serializer_class = CowDetailSerializer
-    permission_classes = (IsAuthenticated, IsUser)
+    permission_classes = (IsAuthenticated, IsOwner)
 
 
 class RecordList(generics.ListCreateAPIView):
@@ -38,7 +38,7 @@ class RecordList(generics.ListCreateAPIView):
 
 class RecordDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RecordSerializer
-    permission_classes = (IsAuthenticated, IsUser)
+    permission_classes = (IsAuthenticated, IsOwner)
 
     def get_queryset(self):
         return Record.objects.filter(user=self.request.user)
