@@ -4,9 +4,11 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 
+from cowapp.models import Cow
+
 
 class BaseTestCase(TestCase):
-    verbose = False
+    verbose = True
 
     def setUp(self):
         self.username = 'user1'
@@ -82,3 +84,87 @@ class UserViewTest(BaseTestCase):
     def test_delete(self):
         self.delete_test('/users/my/')
         self.assertFalse(User.objects.filter(username=self.username).exists())
+
+
+class CowViewTest(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        self.cow1 = Cow.objects.create(number='002-1023-1203-1', sex='female', birthday='2011-12-21', user=self.user)
+        self.cow2 = Cow.objects.create(number='002-1241-1241-2', sex='male', user=self.user)
+
+    def test_create(self):
+        self.post_test('/cows/', dict(
+            number='002-1231-1411-1',
+            sex='female',
+            birthday='2012-12-23',
+            mother=self.cow1.id,
+        ))
+        self.assertTrue(Cow.objects.filter(number='002-1231-1411-1').exists())
+        self.post_test('/cows/', dict(
+            number='002-1231-1411-2',
+            sex='female',
+            mother=self.cow1.id,
+        ))
+        self.assertTrue(Cow.objects.filter(number='002-1231-1411-2').exists())
+
+    def test_create_fail(self):
+        errors = [
+            dict(
+                number='002-1023-1203-13',
+                sex='female',
+                mother=self.cow1.id,
+            ),
+            dict(
+                number='002-1032223-1203-1',
+                sex='female',
+                mother=self.cow1.id,
+            ),
+            dict(
+                number='00232301-211421121',
+                sex='female',
+                mother=self.cow1.id,
+            ),
+            dict(
+                number='002-1023-1203-1',
+                sex='fe32e',
+                mother=self.cow1.id,
+            ),
+            dict(
+                number='002-1023-1203-1',
+                sex='female',
+                mother=1928391,
+            ),
+            dict(
+                number='002-1023-1203-1',
+                sex='female',
+                mother=self.cow1.id,
+            ),
+        ]
+        for error_input in errors:
+            self.post_test('/cows/', error_input, success=False)
+
+    def test_list(self):
+        response = self.get_test('/cows/')
+        self.assertEqual(len(response.json()), 2)
+
+    def test_update(self):
+        inputs = [
+            dict(number='002-1231-1241-2'),
+            dict(deleted=True),
+        ]
+        for data in inputs:
+            self.patch_test(f'/cows/{self.cow1.id}/', data)
+
+    def test_update_fail(self):
+        errors = [
+            dict(number='102-1231-1421-19'),
+            dict(sex='females'),
+            dict(birthday='1231-12-55'),
+            dict(mother=0),
+        ]
+        for data in errors:
+            self.patch_test(f'/cows/{self.cow1.id}/', data, success=False)
+
+    def test_destroy(self):
+        self.delete_test(f'/cows/{self.cow1.id}/')
+        self.assertFalse(Cow.objects.filter(number=self.cow1.number).exists())
