@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
         if 'password' not in data:
             return data
         try:
-            user = self.instance if self.instance else User(username=data['username'])
+            user = User(username=data['username']) if 'username' in data else self.instance
             validate_password(data['password'], user=user)
         except ValidationError as e:
             raise serializers.ValidationError(dict(password=e.messages))

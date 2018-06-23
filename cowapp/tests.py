@@ -58,3 +58,19 @@ class UserViewTest(BaseTestCase):
 
     def test_my_retrieve(self):
         self.get_test('/users/my/')
+
+    def test_my_update_success(self):
+        response = self.patch_test('/users/my/', dict(password='qwer1234'))
+
+    def test_my_update_fail(self):
+        errors = [
+            dict(password='password'),
+            dict(password='1234'),
+            dict(username='ajowi3jf@231', password='ajowi3jf@231')
+        ]
+        for error_input in errors:
+            response = self.patch_test('/users/my/', error_input, False)
+            self.assertEqual(response.status_code, 400)
+
+    def test_my_delete(self):
+        response = self.delete_test('/users/my/')
