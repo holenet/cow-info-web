@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 
-from cowapp.models import Cow
+from cowapp.models import Cow, Record
 
 
 class BaseTestCase(TestCase):
@@ -78,8 +78,8 @@ class UserViewTest(BaseTestCase):
             dict(password='1234'),
             dict(username='ajowi3jf@231', password='ajowi3jf@231')
         ]
-        for error_input in errors:
-            self.patch_test('/users/my/', error_input, success=False)
+        for data in errors:
+            self.patch_test('/users/my/', data, success=False)
 
     def test_delete(self):
         self.delete_test('/users/my/')
@@ -90,7 +90,7 @@ class CowViewTest(BaseTestCase):
     def setUp(self):
         super().setUp()
         self.cow1 = Cow.objects.create(number='002-1023-1203-1', sex='female', birthday='2011-12-21', user=self.user)
-        self.cow2 = Cow.objects.create(number='002-1241-1241-2', sex='male', user=self.user)
+        self.cow2 = Cow.objects.create(number='002-1241-1241-2', sex='male', user=self.user, deleted=True)
 
     def test_create(self):
         self.post_test('/cows/', dict(
@@ -140,12 +140,14 @@ class CowViewTest(BaseTestCase):
                 mother=self.cow1.id,
             ),
         ]
-        for error_input in errors:
-            self.post_test('/cows/', error_input, success=False)
+        for data in errors:
+            self.post_test('/cows/', data, success=False)
 
     def test_list(self):
         response = self.get_test('/cows/')
         self.assertEqual(len(response.json()), 2)
+        response = self.get_test('/cows/?deleted=True')
+        self.assertEqual(len(response.json()), 1)
 
     def test_update(self):
         inputs = [
@@ -168,3 +170,69 @@ class CowViewTest(BaseTestCase):
     def test_destroy(self):
         self.delete_test(f'/cows/{self.cow1.id}/')
         self.assertFalse(Cow.objects.filter(number=self.cow1.number).exists())
+
+
+class RecordViewTest(CowViewTest):
+    def setUp(self):
+        super().setUp()
+        self.record1 = Record.objects.create(content='asdf', day='1230-12-22', cow=self.cow1, user=self.user)
+
+    def test_create(self):
+        self.post_test('/records/', dict(
+            content='hhhhh',
+            day='1031-03-11',
+            cow=self.cow2.id,
+        ))
+        self.assertTrue(Record.objects.filter(content='hhhhh').exists())
+
+    def test_create_fail(self):
+        errors = [
+            dict(
+                day='1031-03-11',
+                cow=self.cow2.id,
+            ),
+            dict(
+                content='hhhhh',
+                cow=self.cow2.id,
+            ),
+            dict(
+                content='hhhhh',
+                day='1031-03-11',
+            ),
+            dict(
+                content='hhhhh',
+                day='1031-33-11',
+                cow=self.cow2.id,
+            ),
+            dict(
+                content='hhhhh',
+                day='1031-03-11',
+                cow=13791,
+            ),
+        ]
+        for data in errors:
+            self.post_test('/records/', data, success=False)
+
+    def test_list(self):
+        response = self.get_test('/records/')
+        self.assertEqual(len(response.json()), 1)
+        response = self.get_test(f'/records/?cow={self.cow2.id}')
+        self.assertEqual(len(response.json()), 0)
+
+    def test_update(self):
+        inputs = [
+            dict(content='1231414'),
+            dict(etc='145100jaoif'),
+        ]
+        for data in inputs:
+            self.patch_test(f'/records/{self.record1.id}/', data)
+
+    def test_update_fail(self):
+        errors = [
+            dict(content=None),
+            dict(day='10141-241224-14'),
+            dict(cow=1240124),
+            dict(cow=None),
+        ]
+        for data in errors:
+            self.patch_test(f'/records/{self.record1.id}/', data, success=False)
