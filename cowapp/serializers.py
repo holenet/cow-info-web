@@ -30,6 +30,11 @@ class RecordSerializer(serializers.ModelSerializer):
         model = Record
         exclude = ('user',)
 
+    def validate_cow(self, cow):
+        if cow.user != self.context['request'].user:
+            raise serializers.ValidationError('소유 중인 개체에 대해서만 이력을 등록할 수 있습니다.')
+        return cow
+
 
 class CowSerializer(serializers.ModelSerializer):
     sex = serializers.ChoiceField(choices=[('female', 'female'), ('male', 'male')])
