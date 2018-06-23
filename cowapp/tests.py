@@ -55,3 +55,6 @@ class UserViewTest(BaseTestCase):
         self.assertTrue(user.exists())
         user = user.first()
         self.assertNotEqual(user.password, 'pasdoifjaowwef')
+
+    def test_my_retrieve(self):
+        self.get_test('/users/my/')
