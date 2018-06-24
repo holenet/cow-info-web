@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
         if 'password' not in data:
             return data
         try:
-            user = self.instance if self.instance else User(username=data['username'])
+            user = User(username=data['username']) if 'username' in data else self.instance
             validate_password(data['password'], user=user)
         except ValidationError as e:
             raise serializers.ValidationError(dict(password=e.messages))
@@ -30,6 +30,11 @@ class RecordSerializer(serializers.ModelSerializer):
         model = Record
         exclude = ('user',)
 
+    def validate_cow(self, cow):
+        if cow.user != self.context['request'].user:
+            raise serializers.ValidationError('소유 중인 개체에 대해서만 이력을 등록할 수 있습니다.')
+        return cow
+
 
 class CowSerializer(serializers.ModelSerializer):
     sex = serializers.ChoiceField(choices=[('female', 'female'), ('male', 'male')])
@@ -38,7 +43,6 @@ class CowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cow
         exclude = ('user',)
-        read_only_fields = ('deleted', 'records')
 
     def validate_number(self, num):
         if len(num) == 15:
@@ -47,7 +51,7 @@ class CowSerializer(serializers.ModelSerializer):
                 if len(arr[0]) == 3 and len(arr[1]) == len(arr[2]) == 4 and len(arr[3]) == 1:
                     if all([y.isdigit() for x in arr for y in x]):
                         return num
-        raise serializers.ValidationError("Pattern of number is not valid")
+        raise serializers.ValidationError("개체번호의 패턴이 유효하지 않습니다.")
 
 
 class CowDetailSerializer(CowSerializer):
