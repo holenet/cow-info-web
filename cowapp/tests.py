@@ -97,13 +97,13 @@ class CowViewTest(BaseTestCase):
             number='002-1231-1411-1',
             sex='female',
             birthday='2012-12-23',
-            mother=self.cow1.id,
+            mother_number=self.cow1.number,
         ))
         self.assertTrue(Cow.objects.filter(number='002-1231-1411-1').exists())
         self.post_test('/cows/', dict(
             number='002-1231-1411-2',
             sex='female',
-            mother=self.cow1.id,
+            mother_number=self.cow1.number,
         ))
         self.assertTrue(Cow.objects.filter(number='002-1231-1411-2').exists())
 
@@ -112,32 +112,32 @@ class CowViewTest(BaseTestCase):
             dict(
                 number='002-1023-1203-13',
                 sex='female',
-                mother=self.cow1.id,
+                mother_number=self.cow1.number,
             ),
             dict(
                 number='002-1032223-1203-1',
                 sex='female',
-                mother=self.cow1.id,
+                mother_number=self.cow1.number,
             ),
             dict(
                 number='00232301-211421121',
                 sex='female',
-                mother=self.cow1.id,
+                mother_number=self.cow1.number,
             ),
             dict(
                 number='002-1023-1203-1',
                 sex='fe32e',
-                mother=self.cow1.id,
+                mother_number=self.cow1.number,
             ),
             dict(
                 number='002-1023-1203-1',
                 sex='female',
-                mother=1928391,
+                mother_number='1241-2342-1-231',
             ),
             dict(
                 number='002-1023-1203-1',
                 sex='female',
-                mother=self.cow1.id,
+                mother_number=self.cow1.number,
             ),
         ]
         for data in errors:
@@ -162,7 +162,7 @@ class CowViewTest(BaseTestCase):
             dict(number='102-1231-1421-19'),
             dict(sex='females'),
             dict(birthday='1231-12-55'),
-            dict(mother=0),
+            dict(mother_number='124-1241-211212'),
         ]
         for data in errors:
             self.patch_test(f'/cows/{self.cow1.id}/', data, success=False)
