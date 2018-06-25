@@ -53,6 +53,11 @@ class CowSerializer(serializers.ModelSerializer):
                         return num
         raise serializers.ValidationError("개체번호의 패턴이 유효하지 않습니다.")
 
+    def validate_mother_number(self, num):
+        if not num:
+            return num
+        return self.validate_number(num)
+
 
 class CowDetailSerializer(CowSerializer):
     records = RecordSerializer(many=True, read_only=True)

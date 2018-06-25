@@ -6,7 +6,7 @@ class Cow(models.Model):
     number = models.CharField(max_length=20)
     sex = models.TextField()
     birthday = models.DateField(null=True, blank=True)
-    mother = models.ForeignKey('cowapp.Cow', related_name='children', on_delete=models.SET_NULL, null=True, blank=True)
+    mother_number = models.CharField(max_length=20, null=True, blank=True)
     user = models.ForeignKey('auth.User', related_name='cows', on_delete=models.CASCADE)
     deleted = models.BooleanField(default=False)
 
