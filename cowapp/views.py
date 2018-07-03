@@ -8,7 +8,7 @@ from rest_framework.status import HTTP_201_CREATED
 
 from cowapp.models import Cow, Record
 from cowapp.permissions import IsOwner
-from cowapp.serializers import CowSerializer, CowDetailSerializer, RecordSerializer, UserSerializer
+from cowapp.serializers import CowSerializer, RecordSerializer, UserSerializer
 
 
 class FilterOrderAPIView(generics.GenericAPIView):
@@ -87,7 +87,7 @@ class CowList(FilterOrderAPIView, generics.ListCreateAPIView):
 
 class CowDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Cow.objects.all()
-    serializer_class = CowDetailSerializer
+    serializer_class = CowSerializer
     permission_classes = (IsAuthenticated, IsOwner)
 
 
