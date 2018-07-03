@@ -14,6 +14,10 @@ class Cow(models.Model):
         ordering = ('birthday', 'created',)
         unique_together = ('user', 'number')
 
+    @property
+    def summary(self):
+        return f'{self.number.split("-")[2]}{"♂" if self.sex=="male" else "♀"}'
+
     def __str__(self):
         return self.number
 

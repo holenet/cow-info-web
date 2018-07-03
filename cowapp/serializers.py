@@ -26,6 +26,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RecordSerializer(serializers.ModelSerializer):
+    cow_summary = serializers.ReadOnlyField(source='cow.summary')
+    cow_number = serializers.ReadOnlyField(source='cow.number')
+
     class Meta:
         model = Record
         exclude = ('user',)
@@ -39,6 +42,7 @@ class RecordSerializer(serializers.ModelSerializer):
 class CowSerializer(serializers.ModelSerializer):
     sex = serializers.ChoiceField(choices=[('female', 'female'), ('male', 'male')])
     records = RecordSerializer(many=True, read_only=True)
+    summary = serializers.ReadOnlyField()
 
     class Meta:
         model = Cow
@@ -57,11 +61,3 @@ class CowSerializer(serializers.ModelSerializer):
         if not num:
             return num
         return self.validate_number(num)
-
-
-class CowDetailSerializer(CowSerializer):
-    records = RecordSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Cow
-        exclude = ('user',)
