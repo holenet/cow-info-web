@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import FieldError, ValidationError
 from django.db import IntegrityError
 from rest_framework import generics, exceptions
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
@@ -61,6 +62,14 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return User.objects.get_by_natural_key(self.request.user.username)
+
+
+class UserAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        return Response(UserSerializer(user).data)
 
 
 class CowList(FilterOrderAPIView, generics.ListCreateAPIView):
