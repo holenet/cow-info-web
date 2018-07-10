@@ -10,8 +10,8 @@ from cowapp.models import Cow, Record
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'cows', 'records')
-        read_only_fields = ('cows', 'records')
+        fields = ('id', 'username', 'password', 'cows', 'records', 'auth_token')
+        read_only_fields = ('cows', 'records', 'auth_token')
 
     def validate(self, data):
         if 'password' not in data:
