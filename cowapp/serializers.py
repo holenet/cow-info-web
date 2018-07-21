@@ -43,10 +43,17 @@ class CowSerializer(serializers.ModelSerializer):
     sex = serializers.ChoiceField(choices=[('female', 'female'), ('male', 'male')])
     records = RecordSerializer(many=True, read_only=True)
     summary = serializers.ReadOnlyField()
+    mother_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Cow
         exclude = ('user',)
+
+    def get_mother_id(self, instance):
+        mother = Cow.objects.filter(user=instance.user, number=instance.mother_number).first()
+        if mother:
+            return mother.id
+        return None
 
     def validate_number(self, num):
         if len(num) == 15:
